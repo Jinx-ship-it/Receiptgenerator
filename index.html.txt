@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transaction Confirmation</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #111111;
+      color: #e5e5e5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Input Form Screen */
+    .form-wrapper {
+      width: 100%;
+      max-width: 400px;
+      background-color: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .form-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #ffffff;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      color: #a1a1aa;
+      margin-bottom: 6px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #3f3f46;
+      background-color: #111111;
+      color: #ffffff;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: #2a6df4;
+    }
+
+    .send-btn {
+      width: 100%;
+      padding: 14px;
+      margin-top: 6px;
+      border: none;
+      border-radius: 12px;
+      background-color: #2a6df4;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .send-btn:hover {
+      background-color: #1f5bd8;
+    }
+
+    .error {
+      color: #f87171;
+      font-size: 13px;
+      margin-top: 10px;
+      text-align: center;
+      min-height: 18px;
+    }
+
+    /* Confirmation Screen (Matches Reference Image) */
+    .receipt-screen {
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 11vh;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .check-badge {
+      width: 114px;
+      height: 114px;
+      border-radius: 50%;
+      background-color: #2a6df4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 34px;
+    }
+
+    .check-badge svg {
+      width: 58px;
+      height: 58px;
+      stroke: #ffffff;
+      stroke-width: 6.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .sent-heading {
+      font-size: 27px;
+      font-weight: 400;
+      color: #e4e4e7;
+      letter-spacing: 0.2px;
+      margin-bottom: 18px;
+    }
+
+    .sent-amount {
+      font-size: 46px;
+      font-weight: 700;
+      color: #2a6df4;
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+      margin-bottom: 30px;
+      word-break: break-word;
+    }
+
+    .sent-address {
+      font-size: 15.5px;
+      font-weight: 400;
+      color: #d4d4d8;
+      letter-spacing: 0.1px;
+      margin-bottom: 8px;
+      max-width: 100%;
+      word-break: break-all;
+    }
+
+    .sent-network {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      font-size: 16.5px;
+      font-weight: 400;
+      color: #d4d4d8;
+      margin-bottom: 26px;
+    }
+
+    .btc-circle {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background-color: #f7931a;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(12deg);
+    }
+
+    .sent-date {
+      font-size: 16.5px;
+      font-weight: 400;
+      color: #c4c4c8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Step 1: Send Form -->
+  <div id="formView" class="form-wrapper">
+    <h1 class="form-title">Send Crypto</h1>
+    <form id="sendForm">
+      <div class="field">
+        <label for="addressInput">Wallet Address</label>
+        <input
+          type="text"
+          id="addressInput"
+          placeholder="bc10xc4tz825yy5t5jx74d3udndn3xddgcwpkm8nx0je"
+          required
+        />
+      </div>
+
+      <div class="field">
+        <label for="currencyInput">Currency</label>
+        <select id="currencyInput">
+          <option value="USD" selected>USD ($)</option>
+          <option value="BTC">BTC</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="amountInput">Amount</label>
+        <input
+          type="number"
+          id="amountInput"
+          step="any"
+          min="0.00000001"
+          placeholder="875420.00"
+          required
+        />
+      </div>
+
+      <button type="submit" class="send-btn">Send</button>
+      <div id="errorBox" class="error"></div>
+    </form>
+  </div>
+
+  <!-- Step 2: Receipt / Confirmation View -->
+  <div id="receiptView" class="receipt-screen hidden" title="Tap anywhere to return">
+    <div class="check-badge">
+      <svg viewBox="0 0 24 24">
+        <polyline points="19.5 6.5 9.5 16.5 4.5 11.5"></polyline>
+      </svg>
+    </div>
+
+    <div class="sent-heading">Successfully Sent</div>
+    <div id="displayAmount" class="sent-amount">$875,420.00</div>
+    <div id="displayAddress" class="sent-address">bc10xc4tz825yy5t5jx74d3udndn3xddgcwpkm8nx0je</div>
+
+    <div class="sent-network">
+      <span id="displayNetworkText">BTC on</span>
+      <span class="btc-circle">₿</span>
+    </div>
+
+    <div id="displayDate" class="sent-date">Date: 17/11/2026, 00:35:55</div>
+  </div>
+
+  <script>
+    const formView = document.getElementById("formView");
+    const receiptView = document.getElementById("receiptView");
+    const sendForm = document.getElementById("sendForm");
+    const errorBox = document.getElementById("errorBox");
+
+    const displayAmount = document.getElementById("displayAmount");
+    const displayAddress = document.getElementById("displayAddress");
+    const displayNetworkText = document.getElementById("displayNetworkText");
+    const displayDate = document.getElementById("displayDate");
+
+    function getFormattedDate() {
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      const day = pad(now.getDate());
+      const month = pad(now.getMonth() + 1);
+      const year = now.getFullYear();
+      const hours = pad(now.getHours());
+      const minutes = pad(now.getMinutes());
+      const seconds = pad(now.getSeconds());
+      return `Date: ${day}/${month}/${year}, ${hours}:${minutes}:${seconds}`;
+    }
+
+    function formatDisplayAmount(value, currency) {
+      const num = Number(value);
+      if (currency === "USD") {
+        return "$" + num.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+      return num.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 8
+      }) + " BTC";
+    }
+
+    sendForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      errorBox.textContent = "";
+
+      const address = document.getElementById("addressInput").value.trim();
+      const currency = document.getElementById("currencyInput").value;
+      const amount = document.getElementById("amountInput").value.trim();
+
+      if (!address || Number(amount) <= 0 || Number.isNaN(Number(amount))) {
+        errorBox.textContent = "Enter a valid wallet address and amount.";
+        return;
+      }
+
+      displayAmount.textContent = formatDisplayAmount(amount, currency);
+      displayAddress.textContent = address;
+      displayNetworkText.textContent = "BTC on";
+      displayDate.textContent = getFormattedDate();
+
+      formView.classList.add("hidden");
+      receiptView.classList.remove("hidden");
+    });
+
+    // Double-click or tap on the confirmation screen to go back to the form
+    receiptView.addEventListener("dblclick", () => {
+      receiptView.classList.add("hidden");
+      formView.classList.remove("hidden");
+    });
+  </script>
+
+</body>
+</html>
